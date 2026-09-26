@@ -1,0 +1,116 @@
+{% extends "sales/base.html" %}
+
+{% block title %}Settings{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl space-y-5">
+
+  <!-- ================================================================
+       Messaging Settings
+  ================================================================ -->
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-5 py-4">
+      <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+        <span>📨</span> Messaging Settings
+      </h2>
+      <p class="text-xs text-slate-400 mt-0.5">Configure how and when notifications are sent to customers.</p>
+    </div>
+    <div class="p-5">
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- Auto-send toggle -->
+        <div class="flex items-start gap-4 rounded-lg border border-slate-200 p-4">
+          <div class="pt-0.5">
+            {{ form.auto_send_enabled }}
+          </div>
+          <div>
+            <label for="{{ form.auto_send_enabled.id_for_label }}"
+                   class="text-sm font-medium text-slate-800 cursor-pointer">
+              Auto-send Notifications on New Sale
+            </label>
+            <p class="text-xs text-slate-500 mt-0.5">
+              When enabled, all active notification templates will be automatically
+              dispatched via Celery when a new sale is created. Requires a running
+              Celery worker and Redis broker.
+            </p>
+            {% if form.auto_send_enabled.errors %}
+            <p class="mt-1 text-xs text-red-600">{{ form.auto_send_enabled.errors|join:", " }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <button type="submit"
+                  class="inline-flex items-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors">
+            Save Settings
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       Quick Links
+  ================================================================ -->
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-5 py-4">
+      <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+        <span>🔗</span> Quick Links
+      </h2>
+    </div>
+    <div class="divide-y divide-slate-100">
+      <a href="{% url 'sales:template_list' %}"
+         class="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 transition-colors group">
+        <div>
+          <p class="text-sm font-medium text-slate-700 group-hover:text-indigo-600">Notification Templates</p>
+          <p class="text-xs text-slate-400">Create and manage message templates</p>
+        </div>
+        <span class="text-slate-300 group-hover:text-indigo-400">→</span>
+      </a>
+      <a href="/admin/sales/crmsettings/"
+         class="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 transition-colors group"
+         target="_blank" rel="noopener noreferrer">
+        <div>
+          <p class="text-sm font-medium text-slate-700 group-hover:text-indigo-600">Django Admin</p>
+          <p class="text-xs text-slate-400">Advanced configuration and data management</p>
+        </div>
+        <span class="text-slate-300 group-hover:text-indigo-400">↗</span>
+      </a>
+      <a href="/admin/sales/messagelog/"
+         class="flex items-center justify-between px-5 py-3.5 hover:bg-slate-50 transition-colors group"
+         target="_blank" rel="noopener noreferrer">
+        <div>
+          <p class="text-sm font-medium text-slate-700 group-hover:text-indigo-600">Full Message Audit Log</p>
+          <p class="text-xs text-slate-400">View all sent, queued, and failed messages in Admin</p>
+        </div>
+        <span class="text-slate-300 group-hover:text-indigo-400">↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ================================================================
+       Environment Info
+  ================================================================ -->
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-5 py-4">
+      <h2 class="text-sm font-semibold text-slate-800 flex items-center gap-2">
+        <span>⚙️</span> Environment Info
+      </h2>
+    </div>
+    <div class="px-5 py-4 space-y-2 text-sm">
+      <div class="flex justify-between text-slate-600">
+        <span class="text-slate-400 text-xs uppercase font-medium tracking-wide">Messaging Adapter</span>
+        <code class="rounded bg-slate-100 px-2 py-0.5 text-xs font-mono">{{ settings.MESSAGING_ADAPTER|default:"stub" }}</code>
+      </div>
+      <div class="flex justify-between text-slate-600">
+        <span class="text-slate-400 text-xs uppercase font-medium tracking-wide">Debug Mode</span>
+        <code class="rounded bg-slate-100 px-2 py-0.5 text-xs font-mono">{{ settings.DEBUG }}</code>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
