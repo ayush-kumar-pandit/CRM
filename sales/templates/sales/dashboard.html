@@ -1,0 +1,199 @@
+{% extends "sales/base.html" %}
+{% load humanize crm_extras %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- ================================================================
+     KPI Cards
+================================================================ -->
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+
+  <!-- Total Revenue -->
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Total Revenue</p>
+      <span class="text-xl">💰</span>
+    </div>
+    <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_revenue|currency }}</p>
+    <p class="mt-1 text-xs text-slate-400">All-time gross revenue</p>
+  </div>
+
+  <!-- Total Orders -->
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Total Orders</p>
+      <span class="text-xl">🛒</span>
+    </div>
+    <p class="mt-2 text-2xl font-bold text-slate-900">{{ total_orders|intcomma }}</p>
+    <div class="mt-1 flex gap-2 text-xs text-slate-400">
+      <span class="text-amber-600">{{ pending_count }} pending</span>
+      <span>·</span>
+      <span class="text-emerald-600">{{ completed_count }} completed</span>
+    </div>
+  </div>
+
+  <!-- Average Order Value -->
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Avg. Order Value</p>
+      <span class="text-xl">📈</span>
+    </div>
+    <p class="mt-2 text-2xl font-bold text-slate-900">{{ avg_order_value|currency }}</p>
+    <p class="mt-1 text-xs text-slate-400">Per completed order</p>
+  </div>
+
+  <!-- Messages Sent -->
+  <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <p class="text-xs font-medium uppercase tracking-wide text-slate-500">Messages Sent</p>
+      <span class="text-xl">📨</span>
+    </div>
+    <p class="mt-2 text-2xl font-bold text-slate-900">{{ messages_sent|intcomma }}</p>
+    <p class="mt-1 text-xs text-slate-400">SMS + WhatsApp delivered</p>
+  </div>
+
+</div><!-- /kpi grid -->
+
+<!-- ================================================================
+     Sales Trend Chart
+================================================================ -->
+<div class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+  <div class="mb-4 flex items-center justify-between">
+    <div>
+      <h2 class="text-sm font-semibold text-slate-800">Sales Trend</h2>
+      <p class="text-xs text-slate-400">Daily revenue over the last 30 days</p>
+    </div>
+    <a href="{% url 'sales:sale_list' %}"
+       class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+      View all →
+    </a>
+  </div>
+  <div class="relative h-64">
+    <canvas id="salesChart"></canvas>
+  </div>
+</div>
+
+<!-- ================================================================
+     Recent Sales
+================================================================ -->
+<div class="mt-6 rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+    <h2 class="text-sm font-semibold text-slate-800">Recent Sales</h2>
+    <a href="{% url 'sales:sale_list' %}"
+       class="text-xs font-medium text-indigo-600 hover:text-indigo-800 transition-colors">
+      View all →
+    </a>
+  </div>
+
+  {% if recent_sales %}
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-100 text-sm">
+      <thead>
+        <tr class="bg-slate-50">
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Customer</th>
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Product</th>
+          <th class="px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Amount</th>
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Status</th>
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Date</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for sale in recent_sales %}
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-5 py-3">
+            <a href="{% url 'sales:sale_detail' sale.pk %}"
+               class="font-medium text-slate-900 hover:text-indigo-600 transition-colors">
+              {{ sale.customer_name }}
+            </a>
+            <div class="text-xs text-slate-400">{{ sale.email }}</div>
+          </td>
+          <td class="px-5 py-3 text-slate-600">{{ sale.product_name }}</td>
+          <td class="px-5 py-3 text-right font-semibold text-slate-900">{{ sale.total_amount|currency }}</td>
+          <td class="px-5 py-3">{{ sale.status|status_badge }}</td>
+          <td class="px-5 py-3 text-slate-400 text-xs">{{ sale.created_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="flex flex-col items-center justify-center py-12 text-slate-400">
+    <span class="text-4xl mb-3">🛒</span>
+    <p class="text-sm">No sales yet. <a href="{% url 'sales:sale_create' %}" class="text-indigo-600 hover:underline">Create your first sale →</a></p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(async () => {
+  const res = await fetch("{% url 'sales:chart_data' %}");
+  const data = await res.json();
+
+  const ctx = document.getElementById('salesChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: 'Revenue (₹)',
+          data: data.revenue,
+          backgroundColor: 'rgba(99, 102, 241, 0.75)',
+          borderColor: 'rgba(99, 102, 241, 1)',
+          borderWidth: 1,
+          borderRadius: 4,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Orders',
+          data: data.orders,
+          type: 'line',
+          borderColor: 'rgba(16, 185, 129, 0.9)',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderWidth: 2,
+          pointRadius: 3,
+          fill: true,
+          tension: 0.4,
+          yAxisID: 'y1',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top', labels: { font: { size: 12 }, usePointStyle: true } },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              if (ctx.dataset.label.includes('Revenue')) return ` ₹${ctx.parsed.y.toLocaleString('en-IN', {minimumFractionDigits:2})}`;
+              return ` ${ctx.parsed.y} orders`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 11 }, maxTicksLimit: 10 } },
+        y: {
+          type: 'linear', position: 'left',
+          grid: { color: 'rgba(148,163,184,0.15)' },
+          ticks: { font: { size: 11 }, callback: v => '₹' + v.toLocaleString('en-IN') }
+        },
+        y1: {
+          type: 'linear', position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { font: { size: 11 } }
+        },
+      },
+    },
+  });
+})();
+</script>
+{% endblock %}
