@@ -1,0 +1,106 @@
+{% extends "sales/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl">
+
+  <!-- Breadcrumb -->
+  <div class="mb-4 flex items-center gap-2 text-xs text-slate-400">
+    <a href="{% url 'sales:template_list' %}" class="hover:text-indigo-600 transition-colors">Templates</a>
+    <span>/</span>
+    <span class="text-slate-600">{{ page_title }}</span>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="mb-5 text-sm font-semibold text-slate-700">Template Details</h2>
+
+      <div class="space-y-4">
+
+        <!-- Title -->
+        <div>
+          <label for="{{ form.title.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Title <span class="text-red-500">*</span>
+          </label>
+          {{ form.title }}
+          {% if form.title.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.title.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Channel -->
+        <div>
+          <label for="{{ form.channel.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Channel <span class="text-red-500">*</span>
+          </label>
+          {{ form.channel }}
+          {% if form.channel.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.channel.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Body -->
+        <div>
+          <label for="{{ form.body.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Message Body <span class="text-red-500">*</span>
+          </label>
+          {{ form.body }}
+          <!-- Placeholder help -->
+          <div class="mt-2 rounded-lg bg-indigo-50 border border-indigo-100 px-3 py-2 text-xs text-indigo-700">
+            <strong>Available placeholders:</strong>
+            <div class="mt-1 flex flex-wrap gap-1.5">
+              {% for placeholder in "{customer_name},{product_name},{quantity},{total_amount},{status}"|split:"," %}
+              <code class="rounded bg-indigo-100 px-1.5 py-0.5 font-mono text-indigo-800">{{ placeholder }}</code>
+              {% endfor %}
+            </div>
+            <p class="mt-1.5 text-indigo-500">
+              Wrap values in curly braces, e.g. <code class="font-mono">Hello {customer_name}!</code>
+            </p>
+          </div>
+          {% if form.body.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.body.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Active -->
+        <div class="flex items-center gap-3 rounded-lg border border-slate-200 p-3">
+          {{ form.is_active }}
+          <div>
+            <label for="{{ form.is_active.id_for_label }}"
+                   class="text-sm font-medium text-slate-700 cursor-pointer">Active</label>
+            <p class="text-xs text-slate-400">Only active templates are automatically sent and available in the Send Notification panel.</p>
+          </div>
+        </div>
+
+      </div><!-- /space-y -->
+
+      {% if form.non_field_errors %}
+      <div class="mt-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+        {{ form.non_field_errors }}
+      </div>
+      {% endif %}
+
+    </div><!-- /card -->
+
+    <!-- Actions -->
+    <div class="mt-4 flex gap-3">
+      <button type="submit"
+              class="inline-flex items-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors">
+        {{ submit_label }}
+      </button>
+      <a href="{% url 'sales:template_list' %}"
+         class="inline-flex items-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+        Cancel
+      </a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

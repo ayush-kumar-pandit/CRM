@@ -1,0 +1,194 @@
+{% extends "sales/base.html" %}
+{% load crm_extras %}
+
+{% block title %}{{ page_title }}{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+
+<div class="max-w-3xl">
+
+  <!-- Breadcrumb -->
+  <div class="mb-4 flex items-center gap-2 text-xs text-slate-400">
+    <a href="{% url 'sales:sale_list' %}" class="hover:text-indigo-600 transition-colors">Sales</a>
+    <span>/</span>
+    <span class="text-slate-600">{{ page_title }}</span>
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    <!-- ============================================================
+         Section: Customer Information
+    ============================================================ -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm mb-4">
+      <h2 class="mb-4 text-sm font-semibold text-slate-700 flex items-center gap-2">
+        <span>👤</span> Customer Information
+      </h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+        <!-- Customer Name -->
+        <div class="sm:col-span-2">
+          <label for="{{ form.customer_name.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Customer Name <span class="text-red-500">*</span>
+          </label>
+          {{ form.customer_name }}
+          {% if form.customer_name.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.customer_name.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="{{ form.email.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Email <span class="text-red-500">*</span>
+          </label>
+          {{ form.email }}
+          {% if form.email.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.email.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label for="{{ form.phone_number.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            {{ form.phone_number.label }} <span class="text-red-500">*</span>
+          </label>
+          {{ form.phone_number }}
+          <p class="mt-1 text-xs text-slate-400">{{ form.phone_number.help_text }}</p>
+          {% if form.phone_number.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.phone_number.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================
+         Section: Order Details
+    ============================================================ -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm mb-4">
+      <h2 class="mb-4 text-sm font-semibold text-slate-700 flex items-center gap-2">
+        <span>📦</span> Order Details
+      </h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+
+        <!-- Product Name -->
+        <div class="sm:col-span-3">
+          <label for="{{ form.product_name.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Product Name <span class="text-red-500">*</span>
+          </label>
+          {{ form.product_name }}
+          {% if form.product_name.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.product_name.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Quantity -->
+        <div>
+          <label for="{{ form.quantity.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Quantity <span class="text-red-500">*</span>
+          </label>
+          {{ form.quantity }}
+          {% if form.quantity.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.quantity.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Price -->
+        <div>
+          <label for="{{ form.price.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Unit Price <span class="text-red-500">*</span>
+          </label>
+          {{ form.price }}
+          <p class="mt-1 text-xs text-slate-400">{{ form.price.help_text }}</p>
+          {% if form.price.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.price.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Total amount note -->
+        <div class="flex items-end pb-1">
+          <p class="text-xs text-slate-400 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 w-full">
+            💡 <strong>Total amount</strong> is auto-calculated from quantity × price.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================
+         Section: Shipping & Status
+    ============================================================ -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm mb-4">
+      <h2 class="mb-4 text-sm font-semibold text-slate-700 flex items-center gap-2">
+        <span>🚚</span> Shipping & Status
+      </h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+        <!-- Shipping Address -->
+        <div class="sm:col-span-2">
+          <label for="{{ form.shipping_address.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Shipping Address <span class="text-red-500">*</span>
+          </label>
+          {{ form.shipping_address }}
+          {% if form.shipping_address.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.shipping_address.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Status -->
+        <div>
+          <label for="{{ form.status.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">
+            Status
+          </label>
+          {{ form.status }}
+          {% if form.status.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.status.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Notes -->
+        <div>
+          <label for="{{ form.notes.id_for_label }}"
+                 class="block text-xs font-medium text-slate-600 mb-1">Notes</label>
+          {{ form.notes }}
+          {% if form.notes.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.notes.errors|join:", " }}</p>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+    <div class="mb-4 rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+      {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <button type="submit"
+              class="inline-flex items-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors">
+        {{ submit_label }}
+      </button>
+      <a href="{% url 'sales:sale_list' %}"
+         class="inline-flex items-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+        Cancel
+      </a>
+    </div>
+
+  </form>
+</div>
+
+{% endblock %}

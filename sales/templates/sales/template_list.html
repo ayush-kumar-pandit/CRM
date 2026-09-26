@@ -1,0 +1,73 @@
+{% extends "sales/base.html" %}
+{% load crm_extras %}
+
+{% block title %}Templates{% endblock %}
+{% block page_title %}Notification Templates{% endblock %}
+
+{% block content %}
+
+<div class="mb-5 flex items-center justify-between">
+  <p class="text-sm text-slate-500">{{ templates|length }} template{{ templates|length|pluralize }}</p>
+  <a href="{% url 'sales:template_create' %}"
+     class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors">
+    <span>+</span> New Template
+  </a>
+</div>
+
+<div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+  {% if templates %}
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-100 text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Title</th>
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Channel</th>
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Active</th>
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Preview</th>
+          <th class="px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for tmpl in templates %}
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-5 py-3 font-medium text-slate-900">{{ tmpl.title }}</td>
+          <td class="px-5 py-3">
+            <span class="inline-flex items-center gap-1 text-slate-600 text-xs">
+              {{ tmpl.channel|channel_icon }} {{ tmpl.get_channel_display }}
+            </span>
+          </td>
+          <td class="px-5 py-3">
+            {% if tmpl.is_active %}
+            <span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 ring-1 ring-inset ring-emerald-600/20">Active</span>
+            {% else %}
+            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500 ring-1 ring-inset ring-slate-600/20">Inactive</span>
+            {% endif %}
+          </td>
+          <td class="px-5 py-3 text-slate-500 text-xs max-w-xs">
+            {{ tmpl.body|truncate_chars:60 }}
+          </td>
+          <td class="px-5 py-3">
+            <div class="flex items-center justify-end gap-1">
+              <a href="{% url 'sales:template_update' tmpl.pk %}"
+                 class="rounded px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-colors">Edit</a>
+              <a href="{% url 'sales:template_delete' tmpl.pk %}"
+                 class="rounded px-2 py-1 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors">Delete</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="flex flex-col items-center py-16 text-slate-400">
+    <span class="text-5xl mb-4">📨</span>
+    <p class="text-sm font-medium text-slate-600">No templates yet</p>
+    <p class="text-xs mt-1">
+      <a href="{% url 'sales:template_create' %}" class="text-indigo-600 hover:underline">Create your first template →</a>
+    </p>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
