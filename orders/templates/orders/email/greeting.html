@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"/><title>Hello from {{ company_name }}!</title>
+<head><meta charset="UTF-8"/><title>Hello from {{ company_name|default:"InvoStock" }}!</title>
 <style>
   body{margin:0;padding:0;background:#f8fafc;font-family:'Segoe UI',Arial,sans-serif;color:#1e293b;}
   .wrapper{max-width:600px;margin:32px auto;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 8px rgba(0,0,0,.08);}
@@ -21,13 +21,13 @@
   </div>
   <div class="body">
     <p>Hope you're having a wonderful week! 😊<br/>
-    We've been thinking about you and wanted to say <strong>thank you</strong> for being a valued customer of <strong>{{ company_name }}</strong>.</p>
+    We've been thinking about you and wanted to say <strong>thank you</strong> for being a valued customer of <strong>{{ company_name|default:"InvoStock" }}</strong>.</p>
     <p>We have exciting new products and offers waiting for you. Come check us out!</p>
     <p style="margin-top:28px;font-size:13px;color:#94a3b8;">
-      — The {{ company_name }} Team
+      — The {{ company_name|default:"InvoStock" }} Team
     </p>
   </div>
-  <div class="footer">&copy; {{ company_name }}. You're receiving this because you're a valued client.</div>
+  <div class="footer">&copy; {{ company_name|default:"InvoStock" }}. You're receiving this because you're a valued client.</div>
 </div>
 </body>
 </html>

@@ -1,9 +1,10 @@
-{% load crm_extras %}<!DOCTYPE html>
+{% load crm_extras static %}<!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}CRM{% endblock %} | SalesPilot</title>
+  <title>{% block title %}CRM{% endblock %} | InvoStock</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
@@ -41,9 +42,16 @@
   <div class="flex h-full">
     <!-- Sidebar -->
     <aside :class="sidebarOpen?'w-64':'w-16'" class="flex h-full flex-col border-r border-slate-200 bg-white transition-all duration-300 shrink-0">
-      <div class="flex items-center gap-3 px-4 py-5 border-b border-slate-100">
-        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold text-sm">SP</div>
-        <span x-show="sidebarOpen" class="text-sm font-semibold text-slate-800 truncate">SalesPilot</span>
+      <div class="flex items-center gap-3 px-3.5 py-4 border-b border-slate-100">
+        <a href="{% url 'sales:dashboard' %}" class="flex items-center gap-2.5 overflow-hidden group">
+          <img src="{% static 'images/invostock-icon.svg' %}" alt="InvoStock" class="h-8 w-8 shrink-0 rounded-lg shadow-sm group-hover:scale-105 transition-transform" />
+          <div x-show="sidebarOpen" class="flex flex-col overflow-hidden">
+            <span class="text-base font-bold tracking-tight text-slate-900 leading-none">
+              Invo<span class="text-indigo-600">Stock</span>
+            </span>
+            <span class="text-[9.5px] font-semibold uppercase tracking-wider text-slate-400 mt-1">CRM &amp; Inventory</span>
+          </div>
+        </a>
       </div>
 
       {% with url_name=request.resolver_match.url_name %}
@@ -97,12 +105,26 @@
       <header class="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6">
         <h1 class="text-base font-semibold text-slate-800">{% block page_title %}Dashboard{% endblock %}</h1>
         <div class="flex items-center gap-3">
+          <span class="hidden sm:inline-flex items-center rounded-md bg-indigo-50 px-2 py-0.5 text-[11px] font-medium text-indigo-700 ring-1 ring-inset ring-indigo-700/10">InvoStock Cloud</span>
           <span class="text-xs text-slate-400">{% now "N j, Y" %}</span>
-          <div class="flex h-7 w-7 items-center justify-center rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold">A</div>
+          <div class="flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-white text-xs font-semibold shadow-sm" title="InvoStock User">IS</div>
         </div>
       </header>
-      <main class="flex-1 overflow-y-auto p-6">
-        {% block content %}{% endblock %}
+      <main class="flex-1 overflow-y-auto p-6 flex flex-col justify-between">
+        <div class="flex-1">
+          {% block content %}{% endblock %}
+        </div>
+        <footer class="mt-12 border-t border-slate-200/60 pt-4 pb-2 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <img src="{% static 'images/invostock-icon.svg' %}" alt="InvoStock" class="h-4 w-4 opacity-75" />
+            <span class="font-semibold text-slate-600">InvoStock</span>
+            <span>&bull;</span>
+            <span>Smart CRM, Sales &amp; Inventory</span>
+          </div>
+          <div>
+            &copy; {% now "Y" %} InvoStock. All rights reserved.
+          </div>
+        </footer>
       </main>
     </div>
   </div>

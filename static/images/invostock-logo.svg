@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <defs>
+    <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#3730A3"/>
+    </linearGradient>
+    <linearGradient id="logoAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="logoDoc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E0E7FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon Mark (40x40 at x=4, y=4) -->
+  <g transform="translate(2, 2)">
+    <rect width="44" height="44" rx="11" fill="url(#logoBg)"/>
+    <!-- Box bottom base -->
+    <path d="M22 16L33 22V31L22 37L11 31V22L22 16Z" fill="#312E81" opacity="0.45"/>
+    <path d="M11 22L22 28V37L11 31V22Z" fill="#4338CA" opacity="0.6"/>
+    <path d="M22 28L33 22V31L22 37V28Z" fill="#3730A3" opacity="0.8"/>
+    <!-- Invoice document -->
+    <path d="M16 9C16 7.89543 16.8954 7 18 7H26L31 12V25C31 26.1046 30.1046 27 29 27H18C16.8954 27 16 26.1046 16 25V9Z" fill="url(#logoDoc)"/>
+    <path d="M26 7V11C26 11.5523 26.4477 12 27 12H31L26 7Z" fill="#C7D2FE"/>
+    <rect x="19" y="14" width="7" height="1.8" rx="0.9" fill="#818CF8"/>
+    <rect x="19" y="18" width="5" height="1.8" rx="0.9" fill="#CBD5E1"/>
+    <!-- Badge -->
+    <circle cx="28.5" cy="23.5" r="4" fill="url(#logoAccent)"/>
+    <path d="M27 23.5L28.2 24.7L30.2 22.3" stroke="#FFFFFF" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(56, 12)">
+    <text x="0" y="21" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700" letter-spacing="-0.5">
+      <tspan fill="#0F172A">Invo</tspan><tspan fill="#4F46E5">Stock</tspan>
+    </text>
+    <text x="1" y="32" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="600" letter-spacing="1.5" fill="#94A3B8">
+      CRM &amp; INVENTORY
+    </text>
+  </g>
+</svg>

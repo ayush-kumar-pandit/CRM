@@ -16,7 +16,7 @@
 </head>
 <body>
 <div class="wrapper">
-  <div class="header"><h1>🎉 Back in Stock!</h1><p>{{ company_name }} — Weekly Restock Alert</p></div>
+  <div class="header"><h1>🎉 Back in Stock!</h1><p>{{ company_name|default:"InvoStock" }} — Weekly Restock Alert</p></div>
   <div class="body">
     <p>Dear <strong>{{ client.name }}</strong>,</p>
     <p>Great news! The following items are back in stock and available for order:</p>
@@ -31,10 +31,10 @@
     <p>Don't miss out — stocks are limited. Place your order today!</p>
     <p style="font-size:13px;color:#64748b;margin-top:24px;">
       Simply reply to this email or contact us to place your order.<br/>
-      — The {{ company_name }} Team
+      — The {{ company_name|default:"InvoStock" }} Team
     </p>
   </div>
-  <div class="footer">&copy; {{ company_name }}. You're receiving this because you're a valued client.</div>
+  <div class="footer">&copy; {{ company_name|default:"InvoStock" }}. You're receiving this because you're a valued client.</div>
 </div>
 </body>
 </html>

@@ -24,7 +24,7 @@
 <body>
 <div class="wrapper">
   <div class="header">
-    <h1>{{ company_name }}</h1>
+    <h1>{{ company_name|default:"InvoStock" }}</h1>
     <p>Invoice — Order #{{ order.pk }} &nbsp;|&nbsp; {{ order.created_at|date:"d M Y" }}</p>
   </div>
   <div class="body">
@@ -61,7 +61,7 @@
     </p>
   </div>
   <div class="footer">
-    &copy; {{ now|date:"Y" }} {{ company_name }}. All rights reserved.
+    &copy; {{ now|date:"Y" }} {{ company_name|default:"InvoStock" }}. All rights reserved.
   </div>
 </div>
 </body>

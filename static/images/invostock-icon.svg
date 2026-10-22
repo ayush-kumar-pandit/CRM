@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="invBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5"/>
+      <stop offset="100%" stop-color="#3730A3"/>
+    </linearGradient>
+    <linearGradient id="invAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="invDoc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E0E7FF"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <!-- Container -->
+  <rect width="48" height="48" rx="12" fill="url(#invBg)"/>
+
+  <!-- Isometric Stock Box Base (Bottom/Left/Right faces) -->
+  <path d="M24 18L36 24V34L24 40L12 34V24L24 18Z" fill="#312E81" opacity="0.45"/>
+  <path d="M12 24L24 30V40L12 34V24Z" fill="#4338CA" opacity="0.6"/>
+  <path d="M24 30L36 24V34L24 40V30Z" fill="#3730A3" opacity="0.8"/>
+
+  <!-- Emerging Invoice / Growth Document -->
+  <g filter="url(#shadow)">
+    <!-- Invoice Sheet -->
+    <path d="M18 10C18 8.89543 18.8954 8 20 8H28L34 14V28C34 29.1046 33.1046 30 32 30H20C18.8954 30 18 29.1046 18 28V10Z" fill="url(#invDoc)"/>
+    <!-- Folded Dog-ear Corner -->
+    <path d="M28 8V13C28 13.5523 28.4477 14 29 14H34L28 8Z" fill="#C7D2FE"/>
+    
+    <!-- Invoice Content Lines -->
+    <rect x="22" y="15" width="8" height="2" rx="1" fill="#818CF8"/>
+    <rect x="22" y="19" width="6" height="2" rx="1" fill="#CBD5E1"/>
+    <rect x="22" y="23" width="7" height="2" rx="1" fill="#CBD5E1"/>
+
+    <!-- Upward Trend / Verified Check Badge -->
+    <circle cx="31" cy="26" r="4.5" fill="url(#invAccent)"/>
+    <path d="M29.2 26L30.5 27.3L32.8 24.8" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
