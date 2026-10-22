@@ -1,0 +1,273 @@
+{% extends "sales/base.html" %}
+
+{% block title %}New Order{% endblock %}
+{% block page_title %}New Sales Order{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl" x-data="orderForm()" x-init="init()">
+
+  <!-- Breadcrumb -->
+  <div class="mb-4 flex items-center gap-2 text-xs text-slate-400">
+    <a href="{% url 'orders:order_list' %}" class="hover:text-indigo-600">Orders</a>
+    <span>/</span><span class="text-slate-600">New Order</span>
+  </div>
+
+  <form method="post" @submit="prepareSubmit" novalidate>
+    {% csrf_token %}
+    <!-- Hidden field: serialized line items sent on submit -->
+    <input type="hidden" name="items_json" :value="JSON.stringify(items)" />
+    <input type="hidden" name="client_mode" :value="clientMode" />
+
+    <!-- ================================================================
+         SECTION 1 — Client
+    ================================================================ -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm mb-4">
+      <h2 class="mb-4 text-sm font-semibold text-slate-700 flex items-center gap-2"><span>👤</span> Client</h2>
+
+      <!-- Toggle -->
+      <div class="flex gap-2 mb-4">
+        <button type="button" @click="clientMode='existing'"
+                :class="clientMode==='existing' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-50'"
+                class="rounded-lg px-4 py-1.5 text-xs font-medium transition-colors">
+          Select Existing Client
+        </button>
+        <button type="button" @click="clientMode='new'"
+                :class="clientMode==='new' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-50'"
+                class="rounded-lg px-4 py-1.5 text-xs font-medium transition-colors">
+          + Quick Add New Client
+        </button>
+      </div>
+
+      <!-- Existing client dropdown -->
+      <div x-show="clientMode==='existing'" x-transition>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Select Client <span class="text-red-500">*</span></label>
+        <select name="client_id"
+                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                :required="clientMode==='existing'">
+          <option value="">— Choose a client —</option>
+          {% for client in clients %}
+          <option value="{{ client.pk }}">{{ client.name }} ({{ client.phone_number }})</option>
+          {% endfor %}
+        </select>
+        <p class="mt-1 text-xs text-slate-400">
+          Don't see the client?
+          <a href="{% url 'orders:client_create' %}" target="_blank" class="text-indigo-600 hover:underline">Add them here →</a>
+        </p>
+      </div>
+
+      <!-- New client inline form -->
+      <div x-show="clientMode==='new'" x-transition class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Full Name <span class="text-red-500">*</span></label>
+          <input type="text" name="nc-name"
+                 class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                 placeholder="Jane Doe" :required="clientMode==='new'" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Phone (E.164) <span class="text-red-500">*</span></label>
+          <input type="text" name="nc-phone_number"
+                 class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                 placeholder="+919876543210" :required="clientMode==='new'" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Email <span class="text-red-500">*</span></label>
+          <input type="email" name="nc-email"
+                 class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                 placeholder="jane@example.com" :required="clientMode==='new'" />
+        </div>
+      </div>
+
+    </div><!-- /client card -->
+
+    <!-- ================================================================
+         SECTION 2 — Line Items
+    ================================================================ -->
+    <div class="rounded-xl border border-slate-200 bg-white shadow-sm mb-4">
+      <div class="border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+        <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2"><span>📦</span> Order Items</h2>
+        <button type="button" @click="addItem()"
+                class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 border border-indigo-200 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors">
+          + Add Item
+        </button>
+      </div>
+
+      <!-- Column headers -->
+      <div class="grid grid-cols-12 gap-3 px-6 py-2 bg-slate-50 border-b border-slate-100 text-xs font-medium uppercase tracking-wide text-slate-400">
+        <div class="col-span-5">Product</div>
+        <div class="col-span-2 text-right">Stock</div>
+        <div class="col-span-2 text-right">Qty</div>
+        <div class="col-span-2 text-right">Unit Price (₹)</div>
+        <div class="col-span-1 text-right">Line Total</div>
+      </div>
+
+      <!-- Dynamic rows -->
+      <div class="divide-y divide-slate-100">
+        <template x-for="(item, idx) in items" :key="idx">
+          <div class="grid grid-cols-12 gap-3 items-center px-6 py-3">
+
+            <!-- Product select -->
+            <div class="col-span-5">
+              <select @change="onProductChange(idx, $event)"
+                      class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                <option value="">— Select product —</option>
+                <template x-for="p in products" :key="p.id">
+                  <option :value="p.id" :selected="item.product_id == p.id" x-text="p.name"></option>
+                </template>
+              </select>
+              <p x-show="item.product_id && item.stock_warning"
+                 class="mt-0.5 text-xs text-red-600" x-text="`Only ${item.max_stock} in stock`"></p>
+            </div>
+
+            <!-- Available stock -->
+            <div class="col-span-2 text-right">
+              <span class="text-xs font-mono" :class="item.max_stock > 0 ? 'text-emerald-600' : 'text-red-500'"
+                    x-text="item.product_id ? item.max_stock : '—'"></span>
+            </div>
+
+            <!-- Quantity -->
+            <div class="col-span-2">
+              <input type="number" min="1" :max="item.max_stock || 9999"
+                     x-model.number="item.quantity"
+                     @input="validateStock(idx)"
+                     class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm text-right focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                     :class="item.stock_warning ? 'border-red-400 ring-1 ring-red-300' : ''" />
+            </div>
+
+            <!-- Unit price -->
+            <div class="col-span-2">
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">₹</span>
+                <input type="number" min="0.01" step="0.01"
+                       x-model.number="item.unit_price"
+                       class="block w-full rounded-lg border border-slate-300 bg-white pl-7 pr-3 py-2 text-sm shadow-sm text-right focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500" />
+              </div>
+            </div>
+
+            <!-- Line total + remove -->
+            <div class="col-span-1 flex items-center justify-end gap-2">
+              <span class="text-sm font-semibold text-slate-800"
+                    x-text="'₹' + (item.quantity * item.unit_price).toLocaleString('en-IN', {minimumFractionDigits:2})"></span>
+              <button type="button" @click="removeItem(idx)" x-show="items.length > 1"
+                      class="text-red-400 hover:text-red-600 text-lg leading-none transition-colors" title="Remove">×</button>
+            </div>
+
+          </div>
+        </template>
+      </div>
+
+      <!-- Grand total footer -->
+      <div class="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4">
+        <span class="text-sm font-semibold text-slate-600">Order Total</span>
+        <span class="text-xl font-bold text-indigo-700"
+              x-text="'₹' + grandTotal.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2})"></span>
+      </div>
+    </div><!-- /items card -->
+
+    <!-- ================================================================
+         SECTION 3 — Notes
+    ================================================================ -->
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm mb-4">
+      <h2 class="mb-3 text-sm font-semibold text-slate-700">📝 Notes (optional)</h2>
+      <textarea name="notes" rows="2"
+                class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 resize-y"
+                placeholder="Any special instructions or internal notes…"></textarea>
+    </div>
+
+    <!-- ================================================================
+         SECTION 4 — Receipt notice
+    ================================================================ -->
+    <div class="mb-4 rounded-xl border border-indigo-100 bg-indigo-50 px-5 py-3 text-sm text-indigo-700 flex items-start gap-3">
+      <span class="text-lg">📨</span>
+      <div>
+        <strong>Automatic receipt dispatch enabled.</strong><br />
+        Once the order is saved, a <strong>WhatsApp receipt</strong> and <strong>email invoice</strong>
+        will be queued and sent to the client automatically.
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-3">
+      <button type="submit"
+              :disabled="!canSubmit"
+              :class="canSubmit ? 'bg-indigo-600 hover:bg-indigo-700 cursor-pointer' : 'bg-slate-300 cursor-not-allowed'"
+              class="inline-flex items-center gap-2 rounded-lg px-6 py-2.5 text-sm font-medium text-white shadow-sm transition-colors">
+        ✅ Confirm Order &amp; Send Receipt
+      </button>
+      <a href="{% url 'orders:order_list' %}"
+         class="inline-flex items-center rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+        Cancel
+      </a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Product catalogue injected from Django view
+const PRODUCTS_DATA = {{ products_json|safe }};
+
+function orderForm() {
+  return {
+    clientMode: 'existing',
+    products: PRODUCTS_DATA,
+    items: [
+      { product_id: '', product_name: '', quantity: 1, unit_price: 0, max_stock: 0, stock_warning: false }
+    ],
+
+    init() {
+      // Reactivity is handled by Alpine
+    },
+
+    get grandTotal() {
+      return this.items.reduce((sum, item) => sum + (item.quantity || 0) * (item.unit_price || 0), 0);
+    },
+
+    get canSubmit() {
+      const hasItems = this.items.length > 0 && this.items.every(i => i.product_id && i.quantity > 0 && i.unit_price > 0);
+      const noStockWarnings = !this.items.some(i => i.stock_warning);
+      return hasItems && noStockWarnings;
+    },
+
+    addItem() {
+      this.items.push({ product_id: '', product_name: '', quantity: 1, unit_price: 0, max_stock: 0, stock_warning: false });
+    },
+
+    removeItem(idx) {
+      if (this.items.length > 1) this.items.splice(idx, 1);
+    },
+
+    onProductChange(idx, event) {
+      const productId = parseInt(event.target.value);
+      const product = this.products.find(p => p.id === productId);
+      if (product) {
+        this.items[idx].product_id = product.id;
+        this.items[idx].product_name = product.name;
+        this.items[idx].unit_price = parseFloat(product.price);
+        this.items[idx].max_stock = product.stock;
+        this.validateStock(idx);
+      } else {
+        this.items[idx].product_id = '';
+        this.items[idx].unit_price = 0;
+        this.items[idx].max_stock = 0;
+        this.items[idx].stock_warning = false;
+      }
+    },
+
+    validateStock(idx) {
+      const item = this.items[idx];
+      item.stock_warning = item.max_stock > 0 && item.quantity > item.max_stock;
+    },
+
+    prepareSubmit(event) {
+      // Ensure items_json is populated before submit (handled by Alpine :value binding)
+      if (!this.canSubmit) {
+        event.preventDefault();
+        alert('Please fill in all item fields and ensure quantities do not exceed available stock.');
+      }
+    },
+  };
+}
+</script>
+{% endblock %}

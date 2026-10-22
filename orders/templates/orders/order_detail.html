@@ -1,0 +1,85 @@
+{% extends "sales/base.html" %}
+{% load humanize %}
+
+{% block title %}Order #{{ order.pk }}{% endblock %}
+{% block page_title %}Order #{{ order.pk }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+
+  <div class="mb-4 flex items-center gap-2 text-xs text-slate-400">
+    <a href="{% url 'orders:order_list' %}" class="hover:text-indigo-600">Orders</a>
+    <span>/</span><span>{{ order.client.name }}</span>
+  </div>
+
+  <!-- Status + receipt badge -->
+  <div class="mb-5 flex items-center gap-3">
+    <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset
+                 {% if order.status == 'confirmed' %}bg-emerald-100 text-emerald-800 ring-emerald-600/20
+                 {% else %}bg-red-100 text-red-800 ring-red-600/20{% endif %}">
+      {{ order.get_status_display }}
+    </span>
+    <span class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset
+                 {% if order.receipt_sent %}bg-indigo-100 text-indigo-800 ring-indigo-600/20
+                 {% else %}bg-slate-100 text-slate-600 ring-slate-600/20{% endif %}">
+      {% if order.receipt_sent %}📨 Receipt Sent{% else %}⏳ Receipt Pending{% endif %}
+    </span>
+  </div>
+
+  <!-- Client + Order summary card -->
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm mb-5">
+    <div class="border-b border-slate-100 px-5 py-4">
+      <h2 class="text-sm font-semibold text-slate-800">Order Summary</h2>
+    </div>
+    <dl class="grid grid-cols-2 gap-px bg-slate-100">
+      {% with lc="bg-white px-5 py-3" dl="text-xs font-medium text-slate-400 mb-0.5" dv="text-sm font-medium text-slate-900" %}
+      <div class="{{ lc }}"><dt class="{{ dl }}">Client</dt><dd class="{{ dv }}">{{ order.client.name }}</dd></div>
+      <div class="{{ lc }}"><dt class="{{ dl }}">Order Date</dt><dd class="{{ dv }}">{{ order.created_at|date:"M d, Y H:i" }}</dd></div>
+      <div class="{{ lc }}"><dt class="{{ dl }}">Email</dt><dd class="{{ dv }}"><a href="mailto:{{ order.client.email }}" class="text-indigo-600 hover:underline">{{ order.client.email }}</a></dd></div>
+      <div class="{{ lc }}"><dt class="{{ dl }}">Phone</dt><dd class="{{ dv }} font-mono text-xs">{{ order.client.phone_number }}</dd></div>
+      {% if order.notes %}
+      <div class="{{ lc }} col-span-2"><dt class="{{ dl }}">Notes</dt><dd class="text-sm text-slate-600">{{ order.notes }}</dd></div>
+      {% endif %}
+      {% endwith %}
+    </dl>
+  </div>
+
+  <!-- Items table -->
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm mb-5">
+    <div class="border-b border-slate-100 px-5 py-4">
+      <h2 class="text-sm font-semibold text-slate-800">Items Purchased</h2>
+    </div>
+    <table class="min-w-full divide-y divide-slate-100 text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Product</th>
+          <th class="px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Qty</th>
+          <th class="px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Unit Price</th>
+          <th class="px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Line Total</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for item in order.items.all %}
+        <tr class="hover:bg-slate-50">
+          <td class="px-5 py-3 font-medium text-slate-800">{{ item.product.name }}</td>
+          <td class="px-5 py-3 text-right text-slate-600">{{ item.quantity }}</td>
+          <td class="px-5 py-3 text-right text-slate-600">₹{{ item.unit_price|floatformat:2 }}</td>
+          <td class="px-5 py-3 text-right font-semibold text-slate-900">₹{{ item.line_total|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="bg-slate-50">
+          <td colspan="3" class="px-5 py-4 text-right text-sm font-semibold text-slate-700">Order Total</td>
+          <td class="px-5 py-4 text-right text-lg font-bold text-indigo-700">₹{{ order.total_amount|floatformat:2 }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <a href="{% url 'orders:order_list' %}"
+     class="inline-flex items-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">
+    ← Back to Orders
+  </a>
+</div>
+{% endblock %}

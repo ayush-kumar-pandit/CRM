@@ -1,0 +1,49 @@
+{% extends "sales/base.html" %}
+
+{% block title %}Clients{% endblock %}
+{% block page_title %}Clients{% endblock %}
+
+{% block content %}
+<div class="mb-5 flex items-center justify-between">
+  <form method="get" class="flex gap-2">
+    <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Search clients…"
+           class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none w-64" />
+    <button class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Search</button>
+  </form>
+  <a href="{% url 'orders:client_create' %}" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">+ New Client</a>
+</div>
+
+<div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+  {% if clients %}
+  <table class="min-w-full divide-y divide-slate-100 text-sm">
+    <thead class="bg-slate-50">
+      <tr>
+        <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Name</th>
+        <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Phone</th>
+        <th class="px-5 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Email</th>
+        <th class="px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Orders</th>
+        <th class="px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for client in clients %}
+      <tr class="hover:bg-slate-50">
+        <td class="px-5 py-3 font-medium text-slate-900">{{ client.name }}</td>
+        <td class="px-5 py-3 font-mono text-xs text-slate-500">{{ client.phone_number }}</td>
+        <td class="px-5 py-3 text-slate-500">{{ client.email }}</td>
+        <td class="px-5 py-3 text-right text-slate-600">{{ client.orders.count }}</td>
+        <td class="px-5 py-3 text-right">
+          <a href="{% url 'orders:client_update' client.pk %}" class="rounded px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50">Edit</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="flex flex-col items-center py-16 text-slate-400">
+    <span class="text-5xl mb-4">👥</span>
+    <p class="text-sm">No clients yet. <a href="{% url 'orders:client_create' %}" class="text-indigo-600 hover:underline">Add the first →</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

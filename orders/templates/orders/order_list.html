@@ -1,0 +1,81 @@
+{% extends "sales/base.html" %}
+
+{% block title %}Orders{% endblock %}
+{% block page_title %}Order History{% endblock %}
+
+{% block content %}
+<div class="mb-5 flex items-center justify-between">
+  <form method="get" class="flex gap-2">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search client…"
+           class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 w-64" />
+    <button class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Search</button>
+    {% if q %}<a href="{% url 'orders:order_list' %}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">Clear</a>{% endif %}
+  </form>
+  <a href="{% url 'orders:order_create' %}" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">+ New Order</a>
+</div>
+
+<div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+  {% if orders %}
+  <table class="min-w-full divide-y divide-slate-100 text-sm">
+    <thead class="bg-slate-50">
+      <tr>
+        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">#</th>
+        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Client</th>
+        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Items</th>
+        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Total</th>
+        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Status</th>
+        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Receipt</th>
+        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-400">Date</th>
+        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-400">Action</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-slate-100">
+      {% for order in orders %}
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="px-4 py-3 text-slate-400 text-xs">{{ order.pk }}</td>
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">{{ order.client.name }}</div>
+          <div class="text-xs text-slate-400">{{ order.client.phone_number }}</div>
+        </td>
+        <td class="px-4 py-3 text-right text-slate-600">{{ order.items.count }}</td>
+        <td class="px-4 py-3 text-right font-semibold text-slate-900">₹{{ order.total_amount|floatformat:2 }}</td>
+        <td class="px-4 py-3">
+          <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset
+                       {% if order.status == 'confirmed' %}bg-emerald-100 text-emerald-800 ring-emerald-600/20{% else %}bg-red-100 text-red-800 ring-red-600/20{% endif %}">
+            {{ order.get_status_display }}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-xs">
+          {% if order.receipt_sent %}
+          <span class="text-indigo-600">📨 Sent</span>
+          {% else %}
+          <span class="text-slate-400">⏳ Pending</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-slate-400 text-xs">{{ order.created_at|date:"M d, Y" }}</td>
+        <td class="px-4 py-3 text-right">
+          <a href="{% url 'orders:order_detail' order.pk %}" class="rounded px-2 py-1 text-xs font-medium text-indigo-600 hover:bg-indigo-50 transition-colors">View</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if is_paginated %}
+  <div class="flex items-center justify-between border-t border-slate-100 px-4 py-3 text-sm text-slate-500">
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    <div class="flex gap-1">
+      {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">← Prev</a>{% endif %}
+      {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}" class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs hover:bg-slate-50">Next →</a>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% else %}
+  <div class="flex flex-col items-center py-16 text-slate-400">
+    <span class="text-5xl mb-4">📋</span>
+    <p class="text-sm">No orders yet. <a href="{% url 'orders:order_create' %}" class="text-indigo-600 hover:underline">Create the first one →</a></p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
