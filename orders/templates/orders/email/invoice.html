@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Invoice — Order #{{ order.pk }}</title>
+<style>
+  body { margin: 0; padding: 0; background: #f8fafc; font-family: 'Segoe UI', Arial, sans-serif; color: #1e293b; }
+  .wrapper { max-width: 600px; margin: 32px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 8px rgba(0,0,0,.08); }
+  .header { background: #4f46e5; color: #fff; padding: 28px 32px; }
+  .header h1 { margin: 0 0 4px; font-size: 22px; font-weight: 700; }
+  .header p { margin: 0; font-size: 13px; opacity: .85; }
+  .body { padding: 28px 32px; }
+  .greeting { font-size: 15px; margin-bottom: 20px; color: #334155; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { background: #f1f5f9; color: #64748b; text-transform: uppercase; font-size: 11px; letter-spacing: .05em; padding: 10px 12px; text-align: left; }
+  td { padding: 11px 12px; border-bottom: 1px solid #e2e8f0; }
+  td.right, th.right { text-align: right; }
+  .total-row td { font-weight: 700; font-size: 15px; background: #f8fafc; border-top: 2px solid #e2e8f0; }
+  .total-row .amount { color: #4f46e5; font-size: 18px; }
+  .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 18px 32px; font-size: 12px; color: #94a3b8; text-align: center; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <h1>{{ company_name }}</h1>
+    <p>Invoice — Order #{{ order.pk }} &nbsp;|&nbsp; {{ order.created_at|date:"d M Y" }}</p>
+  </div>
+  <div class="body">
+    <p class="greeting">Dear <strong>{{ order.client.name }}</strong>,<br />Thank you for your purchase! Here's your invoice summary.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th class="right">Qty</th>
+          <th class="right">Unit Price</th>
+          <th class="right">Line Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in items %}
+        <tr>
+          <td>{{ item.product.name }}</td>
+          <td class="right">{{ item.quantity }}</td>
+          <td class="right">₹{{ item.unit_price|floatformat:2 }}</td>
+          <td class="right">₹{{ item.line_total|floatformat:2 }}</td>
+        </tr>
+        {% endfor %}
+        <tr class="total-row">
+          <td colspan="3" class="right">Order Total</td>
+          <td class="right amount">₹{{ order.total_amount|floatformat:2 }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top:24px; font-size:13px; color:#64748b;">
+      For any queries, simply reply to this email.<br />
+      We look forward to serving you again! 🙏
+    </p>
+  </div>
+  <div class="footer">
+    &copy; {{ now|date:"Y" }} {{ company_name }}. All rights reserved.
+  </div>
+</div>
+</body>
+</html>
