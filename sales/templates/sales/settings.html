@@ -1,0 +1,38 @@
+{% extends "sales/base.html" %}
+
+{% block title %}Settings{% endblock %}
+{% block page_title %}System Configuration{% endblock %}
+
+{% block content %}
+<div class="max-w-xl">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm space-y-6">
+      <div>
+        <h3 class="text-sm font-semibold text-slate-800 mb-1">Automation Rules</h3>
+        <p class="text-xs text-slate-400">Control automated dispatch of SMS &amp; WhatsApp notifications upon sale creation.</p>
+      </div>
+
+      <div class="flex items-start gap-3 rounded-lg bg-slate-50 p-4 border border-slate-100">
+        <div class="pt-0.5">
+          {{ form.auto_send_enabled }}
+        </div>
+        <div>
+          <label for="{{ form.auto_send_enabled.id_for_label }}" class="text-xs font-semibold text-slate-800 cursor-pointer">
+            Automatically Dispatch Notifications
+          </label>
+          <p class="text-xs text-slate-500 mt-0.5">
+            When enabled, creating a new sale record triggers asynchronous background tasks via Celery to dispatch active notification templates to the customer.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 flex justify-end">
+      <button type="submit" class="rounded-lg bg-indigo-600 px-5 py-2 text-xs font-medium text-white hover:bg-indigo-700 transition-colors shadow-sm">
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
