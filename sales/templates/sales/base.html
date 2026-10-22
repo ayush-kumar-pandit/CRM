@@ -42,15 +42,10 @@
   <div class="flex h-full">
     <!-- Sidebar -->
     <aside :class="sidebarOpen?'w-64':'w-16'" class="flex h-full flex-col border-r border-slate-200 bg-white transition-all duration-300 shrink-0">
-      <div class="flex items-center gap-3 px-3.5 py-4 border-b border-slate-100">
+      <div class="flex items-center gap-3 px-3.5 py-3.5 border-b border-slate-100 min-h-[64px]">
         <a href="{% url 'sales:dashboard' %}" class="flex items-center gap-2.5 overflow-hidden group">
-          <img src="{% static 'images/invostock-icon.svg' %}" alt="InvoStock" class="h-8 w-8 shrink-0 rounded-lg shadow-sm group-hover:scale-105 transition-transform" />
-          <div x-show="sidebarOpen" class="flex flex-col overflow-hidden">
-            <span class="text-base font-bold tracking-tight text-slate-900 leading-none">
-              Invo<span class="text-indigo-600">Stock</span>
-            </span>
-            <span class="text-[9.5px] font-semibold uppercase tracking-wider text-slate-400 mt-1">CRM &amp; Inventory</span>
-          </div>
+          <img x-show="sidebarOpen" src="{% static 'images/invostock-logo.svg' %}" alt="InvoStock" class="h-9 w-auto max-w-[190px] object-contain transition-transform group-hover:scale-[1.02]" />
+          <img x-show="!sidebarOpen" src="{% static 'images/invostock-icon.svg' %}" alt="InvoStock" class="h-8 w-8 shrink-0 rounded-lg shadow-sm transition-transform group-hover:scale-105" />
         </a>
       </div>
 
