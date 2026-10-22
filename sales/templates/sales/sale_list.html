@@ -1,0 +1,105 @@
+{% extends "sales/base.html" %}
+{% load crm_extras humanize %}
+
+{% block title %}Sales Management{% endblock %}
+{% block page_title %}Sales Directory{% endblock %}
+
+{% block content %}
+<div class="space-y-4">
+
+  <!-- Filters & Actions Bar -->
+  <div class="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
+    <form method="get" class="flex flex-wrap items-center gap-3">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search customer, product..."
+             class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 w-52" />
+
+      <select name="status" class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+        <option value="">All Statuses</option>
+        {% for code, label in status_choices %}
+        <option value="{{ code }}" {% if status_filter == code %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+
+      <input type="date" name="date_from" value="{{ date_from }}" title="From Date"
+             class="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs shadow-sm focus:border-indigo-500 focus:outline-none" />
+      <span class="text-xs text-slate-400">to</span>
+      <input type="date" name="date_to" value="{{ date_to }}" title="To Date"
+             class="rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs shadow-sm focus:border-indigo-500 focus:outline-none" />
+
+      <button type="submit" class="rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-900 transition-colors">Filter</button>
+      {% if q or status_filter or date_from or date_to %}
+      <a href="{% url 'sales:sale_list' %}" class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-50 transition-colors">Reset</a>
+      {% endif %}
+    </form>
+
+    <a href="{% url 'sales:sale_create' %}" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700 transition-colors shadow-sm shrink-0">
+      <span>+</span> Create Sale
+    </a>
+  </div>
+
+  <!-- Table -->
+  <div class="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm text-slate-600">
+        <thead class="border-b border-slate-100 bg-slate-50 text-xs font-semibold uppercase text-slate-400">
+          <tr>
+            <th class="px-6 py-3">Customer</th>
+            <th class="px-6 py-3">Phone</th>
+            <th class="px-6 py-3">Product</th>
+            <th class="px-6 py-3 text-right">Price</th>
+            <th class="px-6 py-3 text-right">Qty</th>
+            <th class="px-6 py-3 text-right">Total</th>
+            <th class="px-6 py-3">Status</th>
+            <th class="px-6 py-3">Date</th>
+            <th class="px-6 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for sale in sales %}
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4 font-medium text-slate-900">
+              <a href="{% url 'sales:sale_detail' sale.pk %}" class="hover:text-indigo-600">{{ sale.customer_name }}</a>
+              <div class="text-xs text-slate-400 font-normal">{{ sale.email }}</div>
+            </td>
+            <td class="px-6 py-4 font-mono text-xs">{{ sale.phone_number }}</td>
+            <td class="px-6 py-4">{{ sale.product_name }}</td>
+            <td class="px-6 py-4 text-right">₹{{ sale.price|floatformat:2|intcomma }}</td>
+            <td class="px-6 py-4 text-right">{{ sale.quantity }}</td>
+            <td class="px-6 py-4 text-right font-medium text-slate-900">₹{{ sale.total_amount|floatformat:2|intcomma }}</td>
+            <td class="px-6 py-4">{{ sale.status|status_badge }}</td>
+            <td class="px-6 py-4 text-xs text-slate-400">{{ sale.created_at|date:"M d, Y" }}</td>
+            <td class="px-6 py-4 text-right space-x-2">
+              <a href="{% url 'sales:sale_detail' sale.pk %}" class="text-xs font-medium text-indigo-600 hover:text-indigo-800">View</a>
+              <a href="{% url 'sales:sale_update' sale.pk %}" class="text-xs font-medium text-slate-500 hover:text-slate-800">Edit</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="px-6 py-12 text-center text-slate-400">
+              No sales matching your criteria.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="flex items-center justify-between border-t border-slate-100 px-6 py-3 text-xs text-slate-500">
+      <span>Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} entries</span>
+      <div class="flex gap-1">
+        {% if page_obj.has_previous %}
+        <a href="?{% query_transform page=page_obj.previous_page_number %}" class="rounded border border-slate-200 px-2 py-1 hover:bg-slate-50">Previous</a>
+        {% endif %}
+        <span class="rounded bg-indigo-50 px-2.5 py-1 font-medium text-indigo-600">{{ page_obj.number }}</span>
+        {% if page_obj.has_next %}
+        <a href="?{% query_transform page=page_obj.next_page_number %}" class="rounded border border-slate-200 px-2 py-1 hover:bg-slate-50">Next</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
